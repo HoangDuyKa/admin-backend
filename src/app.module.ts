@@ -15,6 +15,7 @@ import { RestaurantsModule } from '@/modules/restaurants/restaurants.module';
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   imports: [
@@ -34,9 +35,10 @@ import { AppService } from './app.service';
         uri: configService.get<string>('MONGODB_URI'),
       }),
       inject: [ConfigService],
-    })
+    }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

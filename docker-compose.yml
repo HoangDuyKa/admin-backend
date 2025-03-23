@@ -5,14 +5,14 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456
     ports:
-      - 27017:27017
+      - '27017:27017'
     volumes:
-      - mongodb_data_container:/data/db
+      - mongodb_data_container:/data/db # Lưu dữ liệu vào volume
+
 volumes:
   mongodb_data_container:
 
     # docker compose -p duyka-admin up -d
     # docker-compose pull
     # docker exec -it <mongodb_container_id> mongosh -u root -p 123456 --authenticationDatabase admin
-
 #docker-compose up -d
