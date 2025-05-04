@@ -6,7 +6,7 @@ import mongoose, { Model, Types } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { hashPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
-import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { CodeAuthDto, CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer/dist/mailer.service';
@@ -116,8 +116,8 @@ export class UsersService {
       password: hashPassword,
       isActive: false,
       codeId,
-      // codeExpired: dayjs().add(5, 'minutes'),
-      codeExpired: dayjs().add(30, 'seconds'),
+      codeExpired: dayjs().add(5, 'minutes'),
+      // codeExpired: dayjs().add(30, 'seconds'),
     });
     //send email
 
@@ -138,5 +138,24 @@ export class UsersService {
     return {
       _id: user._id,
     };
+  }
+
+  async handleActive(data: CodeAuthDto) {
+    const user = await this.userModel.findOne({
+      _id: data?._id,
+      codeId: data?.code,
+    });
+    if (!user) {
+      throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
+    }
+
+    //check expire code
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+    if (isBeforeCheck) {
+      await this.userModel.updateOne({ _id: user._id }, { isActive: true });
+      return { isBeforeCheck };
+    } else {
+      throw new BadRequestException('Mã code không hợp lệ hoặc đã hết hạn');
+    }
   }
 }
